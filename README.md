@@ -4,4 +4,4 @@ Dataset used https://github.com/mansi234/Hotel-Bookings-Analysis-Project/blob/ma
 
 For EDA and Data Cleaning  https://colab.research.google.com/drive/1Rq3nIU7ms-9pTqtI8j8rqsiEIG2ClAJ1
 
-For Report and Suggestions
+For Report and Suggestions "C:\Users\S\Downloads\Hotel Bookings Analysis Project.docx"
