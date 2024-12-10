@@ -1,0 +1,128 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+import pandas as pd
+df=pd.read_csv('/content/hotel_bookings 2.csv')
+
+df.head()
+
+df.tail(10)
+
+df['reservation_status_date'] = pd.to_datetime(df['reservation_status_date'], format='%d/%m/%Y', errors='coerce')
+
+df.isnull().sum()
+
+df.drop(['company', 'agent'], inplace=True)
+df.dropna
+
+for col in df.describe(include='object').columns:
+  print(col)
+  print(df[col].unique())
+  print('-'*50)
+  df['adr'].plot(kind='box')
+df=df['adr']<5000
+
+cancelled_perc=df["is_canceled"].value_counts(normalize=True)
+cancelled_perc
+plt.figure(figsize=(5,4))
+plt.title('Reservation status count')
+plt.bar(['Not cancelled','cancelled'],df['is_canceled'].value_counts(),edgecolor='r',width=0.7)
+plt.show()
+
+resort_hotel=df[df['hotel']=='Resort Hotel']
+resort_hotel['is_canceled'].value_counts()
+city_hotel=df[df['hotel']=='City Hotel']
+city_hotel['is_canceled'].value_counts(normalize=True)
+resort_hotel=resort_hotel.groupby('reservation_status_date')[['adr']].mean()
+resort_hotel
+city_hotel=city_hotel.groupby('reservation_status_date')[['adr']].mean()
+city_hotel=city_hotel.groupby('reservation_status_date')[['adr']].mean()
+plt.figure(figsize=(10,5))
+ax1=sns.countplot(x='hotel',hue='is_canceled',data=df,palette='Blues')
+legend_labels,_ = ax1.get_legend_handles_labels()
+ax1.legend(bbox_to_anchor=(1,1))
+plt.title('Reservation status in different hotels', size=20)
+plt.xlabel('Hotel')
+plt.ylabel('Number of reservations')
+plt.show()
+
+resort_hotel=df[df['hotel']=='Resort Hotel']
+resort_hotel['is_canceled'].value_counts(normalize=True)
+city_hotel=df[df['hotel']=='City Hotel']
+city_hotel['is_canceled'].value_counts(normalize=True)
+resort_hotel=resort_hotel.groupby('reservation_status_date')[['adr']].mean()
+resort_hotel
+city_hotel=city_hotel.groupby('reservation_status_date')[['adr']].mean()
+plt.figure(figsize=(10,5))
+plt.title('Average Rate in city and resort hotel')
+plt.plot(resort_hotel.index,resort_hotel['adr'],label='Resort Hotel')
+plt.plot(city_hotel.index,city_hotel['adr'],label='City Hotel')
+plt.legend()
+plt.show()
+
+df['month']=df['reservation_status_date'].dt.month
+
+
+plt.figure(figsize=(16,9))
+ax1=sns.countplot(x='month',hue='is_canceled',data=df)
+plt.title('Reservation status per month')
+plt.ylabel('Number of reservations')
+plt.xlabel('month')
+plt.legend(['cancelled','not cancelled'])
+plt.show()
+
+plt.figure(figsize=(10,7))
+plt.title('ADR per month')
+sns.barplot(x='month',y='adr',color='g',data=df[df['is_canceled']==1].groupby ('month')[['adr']].sum().reset_index())
+plt.legend()
+plt.show()
+
+cancelled_data=df[df['is_canceled']==1]
+top_10_country=cancelled_data['country'].value_counts()[:10]
+plt.figure(figsize=(10,8))
+plt.title('Top 10 countries with Reservation cancelled')
+plt.pie(top_10_country,autopct='%.2f',labels=top_10_country.index)
+plt.show()
+
+df['market_segment'].value_counts()
+
+cancelled_df_adr=cancelled_data.groupby('reservation_status_date')>'2016'and ('reservation_status_date')<'2017-09'[['adr']].mean()
+cancelled_df_adr.reset_index(inplace=True)
+cancelled_df_adr.sort_values('reservation_status_date',inplace=True)
+not_cancelled_data=df[df['is_canceled']==0]
+plt.figure(figsize=(20,5))
+plt.title('ADR ')
+plt.plot(not_cancelled_data['reservation_status_date'],not_cancelled_data['adr'],label='not cancelled')
+plt.plot(cancelled_df_adr['reservation_status_date'],cancelled_df_adr['adr'],label='cancelled')
+plt.legend()
+plt.show()
+
+# Ensure 'reservation_status_date' is in datetime format
+df['reservation_status_date'] = pd.to_datetime(df['reservation_status_date'])
+
+# Filter data for the desired date range
+filtered_data = df[(df['reservation_status_date'] > '2016') & (df['reservation_status_date'] < '2017-09')]
+
+# Group by 'reservation_status_date' and calculate the mean of 'adr' for canceled bookings
+cancelled_data = filtered_data[filtered_data['is_canceled'] == 1]
+cancelled_df_adr = cancelled_data.groupby('reservation_status_date')[['adr']].mean()
+not_cancelled_data = filtered_data[filtered_data['is_canceled'] == 0]
+not_cancelled_data = not_cancelled_data.groupby('reservation_status_date')[['adr']].mean()
+
+# Reset index for easier plotting or further operations
+cancelled_df_adr.reset_index(inplace=True)
+cancelled_df_adr.sort_values('reservation_status_date', inplace=True)
+not_cancelled_data.reset_index(inplace=True)
+not_cancelled_data.sort_values('reservation_status_date', inplace=True)
+
+# Plot
+plt.figure(figsize=(20, 5))
+plt.plot(cancelled_df_adr['reservation_status_date'], cancelled_df_adr['adr'], label='Canceled')
+plt.plot(not_cancelled_data['reservation_status_date'],not_cancelled_data['adr'],label='not cancelled')
+plt.title('Average Daily Rate (ADR)')
+plt.xlabel('Reservation Status Date')
+plt.ylabel('ADR')
+plt.legend()
